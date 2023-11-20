@@ -53,9 +53,12 @@ class BodyThread(threading.Thread):
         capture = CaptureThread()
         capture.start()
 
-        with mp_pose.Pose(min_detection_confidence=0.80, min_tracking_confidence=0.5, model_complexity = global_vars.MODEL_COMPLEXITY,static_image_mode = False,enable_segmentation = True) as pose: 
+        with mp_pose.Pose(min_detection_confidence=0.80, min_tracking_confidence=0.5,
+                          max_num_people=2,
+                          model_complexity=global_vars.MODEL_COMPLEXITY,
+                          static_image_mode=False, enable_segmentation=True) as pose:
             
-            while not global_vars.KILL_THREADS and capture.isRunning==False:
+            while not global_vars.KILL_THREADS and capture.isRunning is False:
                 print("Waiting for camera and capture thread.")
                 time.sleep(0.5)
             print("Beginning capture")
@@ -102,9 +105,12 @@ class BodyThread(threading.Thread):
                     self.data = ""
                     i = 0
                     if results.pose_world_landmarks:
-                        hand_world_landmarks = results.pose_world_landmarks
-                        for i in range(0,33):
-                            self.data += "{}|{}|{}|{}\n".format(i,hand_world_landmarks.landmark[i].x,hand_world_landmarks.landmark[i].y,hand_world_landmarks.landmark[i].z)
+                        for person_id, person_landmarks in enumerate(results.pose_landmarks.landmark):
+                            for i in range(0,33):
+                                self.data += "{}|{}|{}|{}|{}\n".format(person_id,
+                                                                       i, person_landmarks.landmark[i].x,
+                                                                       person_landmarks.landmark[i].y,
+                                                                       person_landmarks.landmark[i].z)
                     
                     s = self.data.encode('utf-8') 
                     try:     

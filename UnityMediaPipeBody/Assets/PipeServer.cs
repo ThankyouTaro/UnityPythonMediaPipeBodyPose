@@ -225,12 +225,16 @@ public class PipeServer : MonoBehaviour
                     if (string.IsNullOrWhiteSpace(l))
                         continue;
                     string[] s = l.Split('|');
-                    if (s.Length < 4) continue;
+                    if (s.Length < 5) continue;
                     int i;
-                    if (!int.TryParse(s[0], out i)) continue;
-                    h.positionsBuffer[i].value += new Vector3(float.Parse(s[1]), float.Parse(s[2]), float.Parse(s[3]));
-                    h.positionsBuffer[i].accumulatedValuesCount += 1;
-                    h.active = true;
+                    if (!int.TryParse(s[1], out i)) continue;
+                    if (int.Parse(s[0] == 1))
+                    {
+                        h.positionsBuffer[i].value += new Vector3(float.Parse(s[1]), float.Parse(s[2]), float.Parse(s[3]));
+                        h.positionsBuffer[i].accumulatedValuesCount += 1;
+                        h.active = true;
+                    }
+
                 }
             }
             catch (EndOfStreamException)
